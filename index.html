@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iWikipedia — Demandez, comprenez, vérifiez</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="#" aria-label="Accueil iWikipedia"><span>i</span>Wikipedia</a>
+      <div class="nav-right"><a href="#comment">À propos</a><button class="language">FR⌄</button></div>
+    </header>
+
+    <main>
+      <section class="hero" id="search">
+        <p class="eyebrow">LA CONNAISSANCE, SIMPLIFIÉE</p>
+        <h1>Demandez.<br /><em>Comprenez.</em></h1>
+        <p class="intro">iWikipedia combine l’intelligence artificielle et des sources Wikipédia pour vous aider à explorer le monde.</p>
+        <form class="search-box" id="questionForm">
+          <label class="sr-only" for="question">Votre question</label>
+          <input id="question" autocomplete="off" placeholder="Posez votre question…" value="Qui était Nelson Mandela ?" />
+          <button type="submit">Rechercher <span>→</span></button>
+        </form>
+        <div class="suggestions"><span>Essayez :</span><button type="button" data-question="Pourquoi le ciel est-il bleu ?">Pourquoi le ciel est-il bleu ?</button><button type="button" data-question="Qu’est-ce que l’intelligence artificielle ?">Qu’est-ce que l’intelligence artificielle ?</button></div>
+      </section>
+
+      <section class="answer-wrap" aria-live="polite" id="answerSection">
+        <div class="answer-meta"><span class="dot"></span><span>RÉPONSE IWIKIPEDIA</span><span class="read-time">Lecture : 1 min</span></div>
+        <article class="answer-card">
+          <h2 id="answerTitle">Qui était Nelson Mandela&nbsp;?</h2>
+          <p id="answerText">Nelson Mandela était un avocat et homme politique sud-africain, devenu une figure mondiale de la lutte contre l’apartheid. Emprisonné pendant vingt-sept ans pour son engagement contre ce système de ségrégation raciale, il est élu en 1994 premier président noir de l’Afrique du Sud.</p>
+          <p id="answerText2">Son action a contribué à la transition démocratique du pays et lui a valu le prix Nobel de la paix en 1993, partagé avec Frederik Willem de Klerk.</p>
+          <div class="notice">✦ Cette réponse est une synthèse générée par IA. Vérifiez les sources ci-dessous pour approfondir.</div>
+        </article>
+        <aside class="sources">
+          <div class="sources-title"><span>Sources</span><small>2 sources</small></div>
+          <a href="https://fr.wikipedia.org/wiki/Nelson_Mandela" target="_blank" rel="noreferrer"><b>W</b><span><strong>Nelson Mandela</strong><small>Wikipédia · Encyclopédie libre</small></span><i>↗</i></a>
+          <a href="https://fr.wikipedia.org/wiki/Apartheid" target="_blank" rel="noreferrer"><b>W</b><span><strong>Apartheid</strong><small>Wikipédia · Encyclopédie libre</small></span><i>↗</i></a>
+        </aside>
+      </section>
+    </main>
+
+    <footer id="comment"><span><b>i</b>Wikipedia</span><p>Un outil pour apprendre, explorer et vérifier.</p><small>© 2026 iWikipedia · Les réponses IA peuvent contenir des erreurs.</small></footer>
+    <script src="script.js"></script>
+  </body>
+</html>
