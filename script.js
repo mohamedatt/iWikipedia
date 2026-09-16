@@ -1,7 +1,47 @@
-const facts = {
-  "Pourquoi le ciel est-il bleu ?": ["Pourquoi le ciel est-il bleu ?", "Le ciel paraît bleu parce que les molécules de l’atmosphère diffusent davantage les courtes longueurs d’onde de la lumière du Soleil, notamment le bleu. Ce phénomène s’appelle la diffusion de Rayleigh.", "Au lever et au coucher du soleil, la lumière traverse une plus grande épaisseur d’atmosphère : le bleu est alors davantage dispersé, ce qui laisse apparaître des teintes rouges et orangées."],
-  "Qu’est-ce que l’intelligence artificielle ?": ["Qu’est-ce que l’intelligence artificielle ?", "L’intelligence artificielle est un domaine de l’informatique qui crée des systèmes capables d’effectuer des tâches associées au raisonnement humain, comme comprendre un texte, reconnaître une image ou faire des prédictions.", "Les systèmes actuels apprennent souvent à partir de grandes quantités de données. Leurs réponses doivent cependant être vérifiées, car ils peuvent se tromper."],
-};
-const form=document.querySelector('#questionForm'),input=document.querySelector('#question');
-function showAnswer(question){const data=facts[question]||[question,"iWikipedia est prêt à chercher une réponse à cette question. Cette maquette présente le futur espace de réponse alimenté par Wikipédia et l’IA de ChatGPT.","Pour la version complète, nous connecterons l’API Wikipédia afin d’afficher des faits et des liens vérifiables, puis l’API OpenAI pour produire une synthèse claire."];document.querySelector('#answerTitle').textContent=data[0];document.querySelector('#answerText').textContent=data[1];document.querySelector('#answerText2').textContent=data[2];document.querySelector('#answerSection').scrollIntoView({behavior:'smooth',block:'start'});}
-form.addEventListener('submit',e=>{e.preventDefault();showAnswer(input.value.trim()||'Votre question');});document.querySelectorAll('[data-question]').forEach(button=>button.addEventListener('click',()=>{input.value=button.dataset.question;showAnswer(input.value);}));
+const form = document.querySelector('#questionForm');
+const input = document.querySelector('#question');
+const title = document.querySelector('#answerTitle');
+const text = document.querySelector('#answerText');
+const text2 = document.querySelector('#answerText2');
+const sources = document.querySelector('.sources');
+
+function cleanQuestion(question) {
+  return question.replace(/^(qui|que|qu['’]est-ce que|qu['’]est ce que|pourquoi|comment|où|ou|quand|combien|explique(?:z)?|parle(?:z)?[- ]moi de) +/i, '').replace(/[?!.]+$/g, '').trim();
+}
+
+function setSources(items) {
+  sources.innerHTML = `<div class="sources-title"><span>Sources</span><small>${items.length} source${items.length > 1 ? 's' : ''}</small></div>` + items.map(item => `<a href="${item.url}" target="_blank" rel="noreferrer"><b>W</b><span><strong>${item.label}</strong><small>Wikipédia · Encyclopédie libre</small></span><i>↗</i></a>`).join('');
+}
+
+async function answerQuestion(question) {
+  const query = cleanQuestion(question);
+  if (!query) return;
+  title.textContent = question;
+  text.textContent = 'Je recherche des sources Wikipédia fiables…';
+  text2.textContent = '';
+  sources.innerHTML = '<div class="sources-title"><span>Sources</span><small>Recherche…</small></div>';
+  document.querySelector('#answerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  try {
+    const searchUrl = `https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=2&format=json&origin=*`;
+    const search = await fetch(searchUrl).then(response => response.json());
+    const results = search?.query?.search || [];
+    if (!results.length) throw new Error('Aucun résultat');
+    const pages = await Promise.all(results.map(async result => {
+      const url = `https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(result.title)}`;
+      return fetch(url).then(response => response.ok ? response.json() : null);
+    }));
+    const first = pages.find(Boolean);
+    if (!first?.extract) throw new Error('Aucun résumé');
+    title.textContent = first.title;
+    text.textContent = first.extract;
+    text2.textContent = 'Cette réponse est issue de Wikipédia. Consultez les sources pour vérifier et approfondir l’information.';
+    setSources(pages.filter(Boolean).map(page => ({ label: page.title, url: page.content_urls?.desktop?.page || `https://fr.wikipedia.org/wiki/${encodeURIComponent(page.title)}` })));
+  } catch {
+    text.textContent = 'Je n’ai pas trouvé de réponse Wikipédia suffisamment précise pour cette question.';
+    text2.textContent = 'Essayez de reformuler avec des mots-clés plus simples, par exemple un nom, un lieu, une date ou un concept.';
+    setSources([]);
+  }
+}
+
+form.addEventListener('submit', event => { event.preventDefault(); answerQuestion(input.value); });
+document.querySelectorAll('[data-question]').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.question; answerQuestion(input.value); }));
